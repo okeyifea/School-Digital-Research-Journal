@@ -16,7 +16,7 @@ const Header = ({ user, onLogout }) => {
     <StyledHeader>
       <Logo onClick={() => navigate("/")}>
         <span>📚</span>
-        <h2>FCIT JOURNAL</h2>
+        <h2>GOUNI JOURNAL</h2>
       </Logo>
 
       <NavLinks>

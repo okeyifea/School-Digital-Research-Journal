@@ -32,9 +32,17 @@ const ForgottenPassword = () => {
         open: true,
         title: "Reset Link Ready",
         message: result.resetUrl
-          ? `${result.message}\n\n${result.resetUrl}`
+          ? "Your reset link is ready. You will be redirected to the password reset page now."
           : result.message || "Check your email for the reset link."
       });
+
+      if (result.resetUrl) {
+        const url = new URL(result.resetUrl);
+        setTimeout(() => {
+          navigate(`${url.pathname}${url.search}${url.hash}`);
+        }, 1200);
+        return;
+      }
 
       setTimeout(() => {
         navigate("/login");
@@ -87,9 +95,9 @@ const ForgottenPassword = () => {
           <SuccessMessage>
             <SuccessIcon>OK</SuccessIcon>
             <h2>Check Your Email</h2>
-            <p>We've prepared a password reset link for your account.</p>
-            <SmallText>Please use the link from the modal or your inbox to continue.</SmallText>
-            <SmallText $secondary>Redirecting to login page in a few seconds...</SmallText>
+            <p>We've prepared your password reset request.</p>
+            <SmallText>Please continue using the reset page or the email link if delivery succeeds.</SmallText>
+            <SmallText $secondary>Redirecting automatically...</SmallText>
           </SuccessMessage>
         )}
         <Modal

@@ -48,7 +48,7 @@ const SideNav = ({ user, onLogout }) => {
                   : ""}
             </Role>
             <Role>
-                {user?.role || ""}
+                {user?.college || ""}
             </Role>
           </UserInfo>
         </User>

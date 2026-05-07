@@ -67,24 +67,35 @@ router.post("/forgot-password", async (req, res) => {
     const transporter = createTransporter();
 
     if (transporter) {
-      await transporter.sendMail({
-        to: user.email,
-        from: EMAIL_FROM,
-        subject: "Password Reset",
-        html: `
-          <p>You requested a password reset.</p>
-          <p>Click below to reset your password:</p>
-          <a href="${resetURL}">${resetURL}</a>
-          <p>This link expires in 15 minutes.</p>
-        `
-      });
+      try {
+        await transporter.sendMail({
+          to: user.email,
+          from: EMAIL_FROM,
+          subject: "Password Reset",
+          html: `
+            <p>You requested a password reset.</p>
+            <p>Click below to reset your password:</p>
+            <a href="${resetURL}">${resetURL}</a>
+            <p>This link expires in 15 minutes.</p>
+            <p>If you didn't request this, please ignore this email.</p>
+            <p>Best,<br/>GOUNI Journal Team</p> 
+            <p style="font-size: 12px; color: #888;">If you have any issues, contact support at support@Gouni.com</p>
+          `
+        });
 
-      return res.json({ message: "Reset link sent" });
+        return res.json({ message: "Reset link sent" });
+      } catch (mailError) {
+        console.error("Password reset email failed:", mailError);
+        return res.json({
+          message: "Reset link generated successfully.",
+          resetUrl: resetURL
+        });
+      }
     }
 
     console.warn("Email credentials not configured. Password reset link:", resetURL);
     return res.json({
-      message: "Email service is not configured. Use the generated reset link below.",
+      message: "Reset link generated successfully.",
       resetUrl: resetURL
     });
   } catch (err) {

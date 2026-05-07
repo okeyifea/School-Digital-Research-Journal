@@ -107,7 +107,23 @@ A comprehensive academic research journal management system for Godfrey Okoye Un
    MONGODB_URI=mongodb://localhost:27017/facit_journal
    JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
    PORT=5000
+   FRONTEND_URL=http://localhost:5173
+   EMAIL_FROM=FACIT Journal <no-reply@facit.com>
+
+   # Gmail option
+   EMAIL_USER=your-email@gmail.com
+   EMAIL_PASS=your-gmail-app-password
+
+   # SMTP option
+   SMTP_HOST=
+   SMTP_PORT=587
+   SMTP_SECURE=false
+   SMTP_USER=
+   SMTP_PASS=
    ```
+
+   - Use either the Gmail settings or the SMTP settings.
+   - For Gmail, `EMAIL_PASS` must be an App Password, not your normal Gmail password.
 
 6. **Optional: use MongoDB Atlas instead of local MongoDB**
    - Create a cluster in MongoDB Atlas.
