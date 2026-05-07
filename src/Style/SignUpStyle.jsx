@@ -90,13 +90,12 @@ export const RightSection = styled.div`
 
 export const FormContainer = styled.div`
   width: 100%;
-  max-width: 500px;
   height: auto;
   background: rgba(30, 41, 59, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.1);
   border-radius: 16px;
   padding: 50px 40px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
 
   @media (max-width: 600px) {

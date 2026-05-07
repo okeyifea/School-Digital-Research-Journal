@@ -1,29 +1,13 @@
+import mongoose from "mongoose";
 import db from "../db.js";
 
-db.pragma("foreign_keys = ON");
-
-// Fetch categories
-const categories = db
-  .prepare("SELECT id, name FROM categories")
-  .all();
-
-if (categories.length === 0) {
-  console.error("❌ No categories found. Seed categories first.");
-  process.exit(1);
-}
-
-// DEV reset (safe)
-db.prepare("DELETE FROM research_papers").run();
-db.prepare("DELETE FROM sqlite_sequence WHERE name='research_papers'").run();
-
-// Emails that MUST exist
-const fixedEmails = [
+const TOTAL_PAPERS = 30;
+const FIXED_EMAILS = [
   "student1@example.com",
   "staff1@example.com",
-  "officer1@example.com"
+  "officer1@example.com",
 ];
 
-// Random email generator
 const randomEmail = () => {
   const names = ["john", "mary", "ade", "chioma", "ahmed", "grace"];
   const domains = ["gmail.com", "yahoo.com", "edu.ng"];
@@ -32,88 +16,109 @@ const randomEmail = () => {
   )}@${domains[Math.floor(Math.random() * domains.length)]}`;
 };
 
-// Build submitted_by pool
-const submittedByPool = [
-  ...fixedEmails,
-  ...Array.from({ length: 10 }, randomEmail)
+const buildAuthorRole = (email) => {
+  if (email.startsWith("student")) return "student";
+  if (email.startsWith("staff")) return "staff";
+  if (email.startsWith("officer")) return "officer";
+  return "student";
+};
+
+const buildSubmittedByPool = (usersByEmail) => [
+  ...FIXED_EMAILS.map((email) => usersByEmail.get(email)).filter(Boolean),
+  ...Array.from({ length: 10 }, () => ({
+    _id: new mongoose.Types.ObjectId(),
+    email: randomEmail(),
+    role: "student",
+  })),
 ];
 
-// Insert statement
-const insertPaper = db.prepare(`
-  INSERT INTO research_papers (
-    title,
-    authors,
-    abstract,
-    pdf_path,
-    category,
-    submitted_by,
-    author_role,
-    citation_count,
-    status,
-    approval_required,
-    approval_count,
-    created_at
-  )
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-`);
+const main = async () => {
+  try {
+    await db.connectDB();
+    await db.seedCategories();
+    await db.seedUsers();
 
-const TOTAL_PAPERS = 30;
+    const categories = await db.Category.find({}, "_id name").sort({ name: 1 });
+    if (categories.length === 0) {
+      throw new Error("No categories found. Seed categories first.");
+    }
 
-// 1️⃣ Guarantee at least ONE paper per fixed email
-fixedEmails.forEach((email, i) => {
-  const category = categories[i % categories.length];
-  const authorRole = email.startsWith("student") ? "student" : email.startsWith("staff") ? "staff" : "officer";
+    const fixedUsers = await db.User.find(
+      { email: { $in: FIXED_EMAILS } },
+      "_id email role"
+    );
+    const usersByEmail = new Map(
+      fixedUsers.map((user) => [user.email.toLowerCase(), user])
+    );
 
-  insertPaper.run(
-    `Guaranteed Paper by ${email}`,
-    `Author ${i + 1}`,
-    "This paper guarantees that required test emails exist in the database.",
-    `/uploads/guaranteed-paper-${i + 1}.pdf`,
-    category.id,
-    email,
-    authorRole,
-    Math.floor(Math.random() * 50),
-    "pending",
-    2,
-    0,
-    new Date().toISOString()
-  );
-});
+    const missingEmails = FIXED_EMAILS.filter((email) => !usersByEmail.has(email));
+    if (missingEmails.length > 0) {
+      throw new Error(
+        `Missing seeded users for emails: ${missingEmails.join(", ")}`
+      );
+    }
 
-// 2️⃣ Generate remaining random papers
-for (let i = fixedEmails.length; i < TOTAL_PAPERS; i++) {
-  const category = categories[i % categories.length];
-  const submittedBy =
-    submittedByPool[Math.floor(Math.random() * submittedByPool.length)];
-  const authorRole = submittedBy.startsWith("student")
-    ? "student"
-    : submittedBy.startsWith("staff")
-    ? "staff"
-    : submittedBy.startsWith("officer")
-    ? "officer"
-    : "student";
-  const isApproved = Math.random() > 0.4;
+    await db.ResearchPaper.deleteMany({});
 
-  insertPaper.run(
-    `Sample Research Paper ${i + 1}`,
-    `Author ${i + 1}, Co-Author ${i + 2}`,
-    "This is a dummy abstract used for testing archive filters, categories, and UI rendering.",
-    `/uploads/sample-paper-${i + 1}.pdf`,
-    category.id,
-    submittedBy,
-    authorRole,
-    Math.floor(Math.random() * 100),
-    isApproved ? "approved" : "pending",
-    2,
-    isApproved ? 2 : 0,
-    new Date(
-      2020 + (i % 5),
-      Math.floor(Math.random() * 12),
-      Math.floor(Math.random() * 28) + 1
-    ).toISOString()
-  );
-}
+    const submittedByPool = buildSubmittedByPool(usersByEmail);
+    const papers = [];
 
-console.log("✅ Research papers seeded with random + fixed emails");
+    FIXED_EMAILS.forEach((email, index) => {
+      const user = usersByEmail.get(email);
+      const category = categories[index % categories.length];
 
-db.close();
+      papers.push({
+        title: `Guaranteed Paper by ${email}`,
+        authors: `Author ${index + 1}`,
+        abstract:
+          "This paper guarantees that required test emails exist in the database.",
+        pdf_path: `/uploads/guaranteed-paper-${index + 1}.pdf`,
+        category: category._id,
+        submitted_by: user._id,
+        author_role: user.role || buildAuthorRole(email),
+        citation_count: Math.floor(Math.random() * 50),
+        status: "pending",
+        approval_required: 2,
+        approval_count: 0,
+        created_at: new Date(),
+      });
+    });
+
+    for (let index = FIXED_EMAILS.length; index < TOTAL_PAPERS; index += 1) {
+      const category = categories[index % categories.length];
+      const submitter =
+        submittedByPool[Math.floor(Math.random() * submittedByPool.length)];
+      const isApproved = Math.random() > 0.4;
+
+      papers.push({
+        title: `Sample Research Paper ${index + 1}`,
+        authors: `Author ${index + 1}, Co-Author ${index + 2}`,
+        abstract:
+          "This is a dummy abstract used for testing archive filters, categories, and UI rendering.",
+        pdf_path: `/uploads/sample-paper-${index + 1}.pdf`,
+        category: category._id,
+        submitted_by: submitter._id,
+        author_role: submitter.role || buildAuthorRole(submitter.email),
+        citation_count: Math.floor(Math.random() * 100),
+        status: isApproved ? "approved" : "pending",
+        approval_required: 2,
+        approval_count: isApproved ? 2 : 0,
+        created_at: new Date(
+          2020 + (index % 5),
+          Math.floor(Math.random() * 12),
+          Math.floor(Math.random() * 28) + 1
+        ),
+      });
+    }
+
+    await db.ResearchPaper.insertMany(papers);
+    console.log("Research papers seeded successfully.");
+  } catch (error) {
+    console.error("Error seeding research papers:", error);
+    process.exitCode = 1;
+  } finally {
+    await mongoose.connection.close();
+  }
+};
+
+main();

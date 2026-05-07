@@ -4,6 +4,36 @@ import nodemailer from "nodemailer";
 import db from "../db.js"; 
 
 const router = express.Router();
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+const EMAIL_FROM = process.env.EMAIL_FROM || "FACIT Journal <no-reply@facit.com>";
+
+const createTransporter = () => {
+  if (process.env.SMTP_HOST) {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 587),
+      secure: String(process.env.SMTP_SECURE || "false").toLowerCase() === "true",
+      auth: process.env.SMTP_USER && process.env.SMTP_PASS
+        ? {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+          }
+        : undefined
+    });
+  }
+
+  if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    return nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+  }
+
+  return null;
+};
 
 //FORGOT PASSWORD
 router.post("/forgot-password", async (req, res) => {
@@ -15,7 +45,7 @@ router.post("/forgot-password", async (req, res) => {
     }
 
     // Check if user exists
-    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+    const user = await db.User.findOne({ email }).lean();
 
     if (!user) {
       // Always return success to avoid leaking emails
@@ -27,39 +57,39 @@ router.post("/forgot-password", async (req, res) => {
     const expires = Date.now() + 15 * 60 * 1000; // 15 minutes
 
     // Update user with token
-    db.prepare(`
-      UPDATE users
-      SET resetPasswordToken = ?, resetPasswordExpires = ?
-      WHERE id = ?
-    `).run(token, expires, user.id);
-
-    // Send email
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
+    await db.User.findByIdAndUpdate(user._id, {
+      resetPasswordToken: token,
+      resetPasswordExpires: new Date(expires),
+      updatedAt: new Date(),
     });
 
-    const resetURL = `http://localhost:3000/reset-password/${token}`;
+    const resetURL = `${FRONTEND_URL}/reset-password/${token}`;
+    const transporter = createTransporter();
 
-    await transporter.sendMail({
-      to: user.email,
-      from: "FACIT Journal <no-reply@facit.com>",
-      subject: "Password Reset",
-      html: `
-        <p>You requested a password reset.</p>
-        <p>Click below to reset your password:</p>
-        <a href="${resetURL}">${resetURL}</a>
-        <p>This link expires in 15 minutes.</p>
-      `
+    if (transporter) {
+      await transporter.sendMail({
+        to: user.email,
+        from: EMAIL_FROM,
+        subject: "Password Reset",
+        html: `
+          <p>You requested a password reset.</p>
+          <p>Click below to reset your password:</p>
+          <a href="${resetURL}">${resetURL}</a>
+          <p>This link expires in 15 minutes.</p>
+        `
+      });
+
+      return res.json({ message: "Reset link sent" });
+    }
+
+    console.warn("Email credentials not configured. Password reset link:", resetURL);
+    return res.json({
+      message: "Email service is not configured. Use the generated reset link below.",
+      resetUrl: resetURL
     });
-
-    res.json({ message: "Reset link sent" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -70,33 +100,34 @@ router.post("/reset-password/:token", async (req, res) => {
 
   try {
     if (!password) {
-      return res.status(400).json({ error: "Password is required" });
+      return res.status(400).json({ message: "Password is required" });
     }
 
     // Find user with valid token
-    const user = db.prepare(`
-      SELECT * FROM users 
-      WHERE resetPasswordToken = ? AND resetPasswordExpires > ?
-    `).get(token, Date.now());
+    const user = await db.User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() },
+    }).lean();
 
     if (!user) {
-      return res.status(400).json({ error: "Token expired or invalid" });
+      return res.status(400).json({ message: "Token expired or invalid" });
     }
 
     // Hash new password (keep consistent with login)
     const hashedPassword = crypto.createHash("sha256").update(password).digest("hex");
 
     // Update password and clear token
-    db.prepare(`
-      UPDATE users
-      SET password_hash = ?, resetPasswordToken = NULL, resetPasswordExpires = NULL, updatedAt = strftime('%s','now')
-      WHERE id = ?
-    `).run(hashedPassword, user.id);
+    await db.User.findByIdAndUpdate(user._id, {
+      password_hash: hashedPassword,
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+      updatedAt: new Date(),
+    });
 
     res.json({ message: "Password reset successful" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 });
 

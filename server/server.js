@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 import jwt from "jsonwebtoken";
 import db from "./db.js";
 
-import researchRoutes from "./API/Research.js";
+import researchRoutes from "./API/research.js";
 import authRoutes from "./API/Pass.js";
 import restRoutes from "./API/restPass.js";
 import dashboardRoutes from "./API/Dashboard.js";
@@ -20,7 +20,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsPath = path.resolve(__dirname, "..", "uploads");
 app.use("/uploads", express.static(uploadsPath));
@@ -30,84 +29,27 @@ app.use("/api/auth", restRoutes);
 app.use("/api", dashboardRoutes);
 app.use("/api", reviewRoutes);
 
+// Connect to MongoDB and seed data
+const initializeDatabase = async () => {
+  await db.connectDB();
+  await db.seedCategories();
+  await db.seedUsers();
+};
+
+initializeDatabase();
+
 // Hash function (SHA-256 for demo; use bcrypt in production)
 const hashPassword = (password) => {
   return crypto.createHash("sha256").update(password).digest("hex");
 };
 
-// Seed sample users
-const seedUsers = () => {
-  const users = [
-    {
-      username: "student1",
-      password: "password123",
-      role: "student",
-      fullName: "John Student",
-      email: "student1@example.com",
-      phone: "1234567890",
-      registrationNumber: "GOU/UCC/CSC/001",
-      position: null,
-    },
-    {
-      username: "staff1",
-      password: "password123",
-      role: "staff",
-      fullName: "Jane Staff",
-      email: "staff1@example.com",
-      phone: "9876543210",
-      registrationNumber: null,
-      position: null,
-    },
-    {
-      username: "officer1",
-      password: "password123",
-      role: "officer",
-      fullName: "Dr. Officer Dean",
-      email: "officer1@example.com",
-      phone: "5555555555",
-      registrationNumber: null,
-      position: "HOD",
-    },
-  ];
-
-  const insert = db.prepare(`
-    INSERT OR IGNORE INTO users (
-      username,
-      password_hash,
-      role,
-      fullName,
-      email,
-      phone,
-      registrationNumber,
-      position
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  users.forEach((user) => {
-    insert.run(
-      user.username,
-      hashPassword(user.password),
-      user.role,
-      user.fullName,
-      user.email,
-      user.phone || null,
-      user.registrationNumber || null,
-      user.position || null
-    );
-  });
-
-  console.log("Database seeded with sample users.");
-};
-
-seedUsers();
-
 // Login route
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ success: false, message: "Username and password required" });
 
   try {
-    const user = db.prepare("SELECT * FROM users WHERE username = ?").get(username);
+    const user = await db.User.findOne({ username });
     if (!user) return res.status(401).json({ success: false, message: "Invalid credentials" });
 
     const passwordHash = hashPassword(password);
@@ -116,7 +58,7 @@ app.post("/login", (req, res) => {
 
     // Generate JWT
     const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
+      { id: user._id, username: user.username, role: user.role },
       process.env.JWT_SECRET || "your-secret-key",
       { expiresIn: "1d" }
     );
@@ -124,14 +66,16 @@ app.post("/login", (req, res) => {
     return res.json({
       success: true,
       user: {
-        id: user.id,
+        id: user._id,
         username: user.username,
         fullName: user.fullName,
         email: user.email,
         role: user.role,
         phone: user.phone,
         registrationNumber: user.registrationNumber,
-        position: user.position
+        position: user.position,
+        college: user.college,
+        department: user.department
       },
       token
     });
@@ -141,7 +85,7 @@ app.post("/login", (req, res) => {
   }
 });
 
-const handleSignup = (req, res) => {
+const handleSignup = async (req, res) => {
   console.log("Signup request received:", req.body);
 
   const {
@@ -153,16 +97,18 @@ const handleSignup = (req, res) => {
     phone,
     registrationNumber,
     position,
+    college,
+    department,
   } = req.body;
 
   const normalizedRole = String(role || "").toLowerCase();
   const allowedRoles = new Set(["student", "staff", "officer"]);
 
   // Basic required fields
-  if (!username || !password || !normalizedRole || !fullName || !email) {
+  if (!username || !password || !normalizedRole || !fullName || !email || !college || !department) {
     return res.status(400).json({
       success: false,
-      message: "Username, password, role, full name and email are required",
+      message: "Username, password, role, full name, email, college and department are required",
     });
   }
 
@@ -189,10 +135,10 @@ const handleSignup = (req, res) => {
   }
 
   try {
-    // Check if username already exists
-    const existingUser = db
-      .prepare("SELECT id FROM users WHERE username = ? OR email = ?")
-      .get(username, email);
+    // Check if username or email already exists
+    const existingUser = await db.User.findOne({
+      $or: [{ username }, { email }]
+    });
 
     if (existingUser) {
       return res.status(400).json({
@@ -201,30 +147,21 @@ const handleSignup = (req, res) => {
       });
     }
 
-    // Insert user
-    const insert = db.prepare(`
-      INSERT INTO users (
-        username,
-        password_hash,
-        role,
-        fullName,
-        email,
-        phone,
-        registrationNumber,
-        position
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    insert.run(
+    // Create user
+    const newUser = new db.User({
       username,
-      hashPassword(password),
-      normalizedRole,
+      password_hash: hashPassword(password),
+      role: normalizedRole,
       fullName,
       email,
-      phone || null,
-      registrationNumber || null,
-      position || null
-    );
+      phone: phone || null,
+      registrationNumber: registrationNumber || null,
+      position: position || null,
+      college,
+      department,
+    });
+
+    await newUser.save();
 
     console.log(`User ${username} registered successfully`);
 
@@ -247,9 +184,9 @@ app.post("/signup", handleSignup);
 app.post("/api/auth/signup", handleSignup);
 
 // Get all users (for testing)
-app.get("/users", (req, res) => {
+app.get("/users", async (req, res) => {
   try {
-    const users = db.prepare("SELECT id, username, role, fullName, email FROM users").all();
+    const users = await db.User.find({}, 'id username role fullName email college department');
     res.json(users);
   } catch (error) {
     console.error("Get users error:", error);

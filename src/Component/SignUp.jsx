@@ -49,13 +49,43 @@ const SignUp = () => {
     password: "",
     confirmPassword: "",
     role: "",
-    position: "", // For officer sub-role
+    position: "",
+    college: "",
+    department: "",
   });
 
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [modal, setModal] = useState({ open: false, title: "", message: "" });
+
+  // College and Department data
+  const colleges = {
+    "College of Medicine": ["Medicine"],
+    "College of Nursing": ["Nursing"],
+    "College of Law": ["Law"],
+    "Faculty of Computing and Information Technology": [
+      "Software Engineering",
+      "Cybersecurity",
+      "Computer Science"
+    ],
+    "Faculty of Management and Social Sciences": [
+      "International Relations",
+      "Accounting",
+      "Management"
+    ],
+    "Faculty of Natural and Environmental Studies": [
+      "Biochemistry",
+      "Biotechnology",
+      "Industrial Chemical",
+      "Microbiology"
+    ],
+    "Faculty of Arts": [
+      "Philosophy",
+      "History"
+    ],
+    "Faculty of Education": ["Education"]
+  };
 
   // Handle input changes
   const handleChange = (e) => {
@@ -80,6 +110,10 @@ const SignUp = () => {
       newErrors.username = "Username must be at least 3 characters";
 
     if (!formData.role) newErrors.role = "Role is required";
+
+    if (!formData.college) newErrors.college = "College is required";
+
+    if (!formData.department) newErrors.department = "Department is required";
 
     if (formData.role === "student" && !formData.registrationNumber.trim())
       newErrors.registrationNumber = "Registration number is required for students";
@@ -122,10 +156,12 @@ const SignUp = () => {
     const payload = {
       username: formData.username,
      password: formData.password,
-     role: formData.role, // Use raw role from dropdown
+     role: formData.role,
      fullName: formData.fullName,
      email: formData.email,
      phone: formData.phone,
+     college: formData.college,
+     department: formData.department,
     };
     if (formData.role === "student") {payload.registrationNumber = formData.registrationNumber;}
     if (formData.role === "officer") {payload.position = formData.position;}
@@ -257,6 +293,43 @@ const SignUp = () => {
                   <option value="officer">Officer</option>
                 </Select>
                 {errors.role && <ErrorMsg>{errors.role}</ErrorMsg>}
+              </FormGroup>
+
+              <FormGroup>
+                <Label>College *</Label>
+                <Select
+                  name="college"
+                  value={formData.college}
+                  onChange={(e) => {
+                    handleChange(e);
+                    // Reset department when college changes
+                    setFormData(prev => ({ ...prev, department: "" }));
+                  }}
+                  hasError={!!errors.college}
+                >
+                  <option value="" disabled hidden>Select College</option>
+                  {Object.keys(colleges).map(college => (
+                    <option key={college} value={college}>{college}</option>
+                  ))}
+                </Select>
+                {errors.college && <ErrorMsg>{errors.college}</ErrorMsg>}
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Department *</Label>
+                <Select
+                  name="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  hasError={!!errors.department}
+                  disabled={!formData.college}
+                >
+                  <option value="" disabled hidden>Select Department</option>
+                  {formData.college && colleges[formData.college].map(dept => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+                </Select>
+                {errors.department && <ErrorMsg>{errors.department}</ErrorMsg>}
               </FormGroup>
 
               {formData.role === "officer" && (

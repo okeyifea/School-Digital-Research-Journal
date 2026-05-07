@@ -1,48 +1,50 @@
 import db from "../db.js";
 
-// Create table if it doesn't exist
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS papers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    abstract TEXT NOT NULL,
-    fileUrl TEXT,
-    submittedBy TEXT NOT NULL,
-    authorRole TEXT CHECK(authorRole IN ('student', 'staff', 'officer')) NOT NULL,
-    status TEXT CHECK(status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending',
-    isPublished INTEGER DEFAULT 0,
-    revisionOf INTEGER,
-    createdAt INTEGER DEFAULT (strftime('%s','now')),
-    updatedAt INTEGER DEFAULT (strftime('%s','now')),
-    FOREIGN KEY(submittedBy) REFERENCES users(id)
-  )
-`).run();
-
 // Helper functions
 
-export const createPaper = ({ title, abstract, fileUrl, submittedBy, authorRole, revisionOf }) => {
-  const stmt = db.prepare(`
-    INSERT INTO papers (title, abstract, fileUrl, submittedBy, authorRole, revisionOf)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `);
-  const info = stmt.run(title, abstract, fileUrl, submittedBy, authorRole, revisionOf || null);
-  return info.lastInsertRowid;
+export const createPaper = async ({ title, abstract, fileUrl, submittedBy, authorRole, revisionOf }) => {
+  try {
+    const paper = new db.ResearchPaper({
+      title,
+      abstract,
+      pdf_path: fileUrl,
+      submitted_by: submittedBy,
+      author_role: authorRole,
+      revisionOf: revisionOf || null,
+    });
+    const savedPaper = await paper.save();
+    return savedPaper._id;
+  } catch (error) {
+    console.error('Error creating paper:', error);
+    throw error;
+  }
 };
 
-export const getPaperById = (id) => {
-  return db.prepare(`SELECT * FROM papers WHERE id = ?`).get(id);
+export const getPaperById = async (id) => {
+  try {
+    return await db.ResearchPaper.findById(id).populate('submitted_by', 'fullName email college department').populate('category', 'name');
+  } catch (error) {
+    console.error('Error getting paper by ID:', error);
+    throw error;
+  }
 };
 
-export const updatePaperStatus = (id, status) => {
-  return db.prepare(`
-    UPDATE papers
-    SET status = ?, updatedAt = strftime('%s','now')
-    WHERE id = ?
-  `).run(status, id);
+export const updatePaperStatus = async (id, status) => {
+  try {
+    return await db.ResearchPaper.findByIdAndUpdate(id, { status, updatedAt: new Date() }, { new: true });
+  } catch (error) {
+    console.error('Error updating paper status:', error);
+    throw error;
+  }
 };
 
-export const listPapersByAuthor = (authorId) => {
-  return db.prepare(`SELECT * FROM papers WHERE submittedBy = ?`).all(authorId);
+export const listPapersByAuthor = async (authorId) => {
+  try {
+    return await db.ResearchPaper.find({ submitted_by: authorId }).populate('category', 'name').sort({ created_at: -1 });
+  } catch (error) {
+    console.error('Error listing papers by author:', error);
+    throw error;
+  }
 };
 
 export default db;

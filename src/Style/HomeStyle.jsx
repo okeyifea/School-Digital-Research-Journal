@@ -16,6 +16,12 @@ export const HomeText = styled.div`
   position: relative;
   overflow: hidden;
 
+  @media (max-width: 768px) {
+    margin: 20px 15px;
+    padding: 30px 15px;
+    border-radius: 20px;
+  }
+
   &::before {
     content: "";
     position: absolute;
@@ -33,6 +39,15 @@ export const HomeText = styled.div`
     color: white;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     margin: 8px 0;
+
+    @media (max-width: 768px) {
+      font-size: 24px !important;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 20px !important;
+    }
   }
 `;
 
@@ -47,6 +62,11 @@ export const SearchBar = styled.div`
   margin-right: auto;
   margin-bottom: 50px;
 
+  @media (max-width: 768px) {
+    margin-top: 50px;
+    margin-bottom: 30px;
+  }
+
   .search_bar {
    height: 60px;
     display: flex;
@@ -59,6 +79,12 @@ export const SearchBar = styled.div`
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
     transition: all 0.3s ease;
 
+    @media (max-width: 768px) {
+      height: 50px;
+      padding: 6px 15px;
+      flex-wrap: wrap;
+    }
+
     &:hover {
       box-shadow: 0 12px 35px rgba(102, 126, 234, 0.35);
     }
@@ -67,6 +93,10 @@ export const SearchBar = styled.div`
       color: #999;
       font-size: 14px;
       margin-right: 12px;
+
+      @media (max-width: 768px) {
+        display: none;
+      }
     }
 
     input {
@@ -77,6 +107,16 @@ export const SearchBar = styled.div`
       color: #333;
       padding: 8px 12px;
       width: 400px;
+
+      @media (max-width: 768px) {
+        width: 250px;
+        font-size: 14px;
+        padding: 6px 8px;
+      }
+
+      @media (max-width: 480px) {
+        width: 200px;
+      }
 
       &::placeholder {
         color: #ccc;

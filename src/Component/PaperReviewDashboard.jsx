@@ -153,7 +153,18 @@ const Dashboard = ({ user, setUser }) => {
     const token = storedUser?.token || localStorage.getItem("token");
     if (!token) return;
     if (!file) {
-      alert("Please select a PDF to resubmit.");
+      setModal({
+        open: true,
+        title: "Resubmit Failed",
+        message: "Please select a PDF to resubmit.",
+        actions: [
+          {
+            label: "Close",
+            onClick: () =>
+              setModal({ open: false, title: "", message: "", actions: null })
+          }
+        ]
+      });
       return;
     }
 
@@ -169,10 +180,32 @@ const Dashboard = ({ user, setUser }) => {
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Resubmit failed");
-      alert(result.message || "Paper resubmitted");
+      setModal({
+        open: true,
+        title: "Resubmit Successful",
+        message: result.message || "Paper resubmitted successfully.",
+        actions: [
+          {
+            label: "Close",
+            onClick: () =>
+              setModal({ open: false, title: "", message: "", actions: null })
+          }
+        ]
+      });
       fetchDashboard();
     } catch (err) {
-      alert(err.message || "Failed to resubmit paper");
+      setModal({
+        open: true,
+        title: "Resubmit Failed",
+        message: err.message || "Failed to resubmit paper",
+        actions: [
+          {
+            label: "Close",
+            onClick: () =>
+              setModal({ open: false, title: "", message: "", actions: null })
+          }
+        ]
+      });
     }
   };
 

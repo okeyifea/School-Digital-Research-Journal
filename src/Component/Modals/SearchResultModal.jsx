@@ -23,7 +23,7 @@ const SearchResultsModal = ({ show, onClose, searchQuery, results }) => {
         <ModalBody>
           {results.length === 0 && <EmptyState>No papers found.</EmptyState>}
           {results.map((paper) => (
-            <PaperCard key={paper.id}>
+            <PaperCard key={paper._id || paper.id}>
               <PaperTitle>{paper.title}</PaperTitle>
               <Divider />
               <MetaRow>

@@ -1,44 +1,55 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-
 import { API_URL } from "../../server/API/Auth";
+import Modal from "./Common/Modal.jsx";
 
 const ForgottenPassword = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [email, setEmail] = useState("");
-
+  const [modal, setModal] = useState({ open: false, title: "", message: "" });
 
   const handleReset = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
+    e.preventDefault();
+    setIsLoading(true);
 
-  try {
-    const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
-    });
+    try {
+      const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
 
-    if (!res.ok) {
-      throw new Error("Request failed");
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.message || "Request failed");
+      }
+
+      setSubmitted(true);
+      setModal({
+        open: true,
+        title: "Reset Link Ready",
+        message: result.resetUrl
+          ? `${result.message}\n\n${result.resetUrl}`
+          : result.message || "Check your email for the reset link."
+      });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
+    } catch (err) {
+      console.error(err);
+      setModal({
+        open: true,
+        title: "Reset Request Failed",
+        message: err.message || "Unable to send reset link"
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    setSubmitted(true);
-
-    setTimeout(() => {
-      navigate("/login");
-    }, 3000);
-
-  } catch (err) {
-    console.error(err);
-    alert("Unable to send reset link");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <ForgottenPasswordWrapper>
@@ -67,20 +78,26 @@ const ForgottenPassword = () => {
                 {isLoading ? "Sending..." : "Send Reset Link"}
               </SubmitButton>
 
-              <BackLink onClick={() => navigate("/login")}>
-                ← Back to Login
+              <BackLink type="button" onClick={() => navigate("/login")}>
+                Back to Login
               </BackLink>
             </form>
           </>
         ) : (
           <SuccessMessage>
-            <SuccessIcon>✓</SuccessIcon>
+            <SuccessIcon>OK</SuccessIcon>
             <h2>Check Your Email</h2>
-            <p>We've sent a password reset link to your email address.</p>
-            <SmallText>Please check your inbox and follow the link to reset your password.</SmallText>
-            <SmallText secondary>Redirecting to login page in a few seconds...</SmallText>
+            <p>We've prepared a password reset link for your account.</p>
+            <SmallText>Please use the link from the modal or your inbox to continue.</SmallText>
+            <SmallText $secondary>Redirecting to login page in a few seconds...</SmallText>
           </SuccessMessage>
         )}
+        <Modal
+          open={modal.open}
+          title={modal.title}
+          message={modal.message}
+          onClose={() => setModal({ open: false, title: "", message: "" })}
+        />
       </ForgottenPasswordContainer>
     </ForgottenPasswordWrapper>
   );
@@ -231,14 +248,14 @@ const SuccessIcon = styled.div`
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  font-size: 32px;
+  font-size: 20px;
   color: white;
   font-weight: bold;
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
 `;
 
 const SmallText = styled.p`
-  color: ${props => props.secondary ? '#94a3b8' : '#cbd5e1'};
+  color: ${(props) => (props.$secondary ? "#94a3b8" : "#cbd5e1")};
   font-size: 14px;
   line-height: 1.6;
   margin: 12px 0;

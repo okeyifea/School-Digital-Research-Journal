@@ -2,112 +2,113 @@ import db from "../db.js";
 
 class ResearchService {
 
-  static create({ title, authors, abstract, category, submittedBy, pdfPath, role }) {
-    // Submissions require review
-    const approvalRequired = 2;
-    const status = "pending";
+  static async create({ title, authors, abstract, category, submittedBy, pdfPath, role }) {
+    try {
+      const submittingUser = await db.User.findById(submittedBy);
+      if (!submittingUser) {
+        throw new Error("Submitting user does not exist");
+      }
 
-    // Validate category exists
-    const categoryExists = db
-      .prepare("SELECT id FROM categories WHERE id = ?")
-      .get(category);
+      // Validate category exists
+      const categoryExists = await db.Category.findById(category);
+      if (!categoryExists) {
+        throw new Error("Category does not exist");
+      }
 
-    if (!categoryExists) {
-      throw new Error("Category does not exist");
+      if (
+        ["staff", "officer"].includes(submittingUser.role) &&
+        categoryExists.name !== submittingUser.college
+      ) {
+        throw new Error("You can only submit papers under your own faculty or college");
+      }
+
+      // Create research paper
+      const paper = new db.ResearchPaper({
+        title,
+        authors,
+        abstract,
+        pdf_path: pdfPath,
+        category,
+        submitted_by: submittingUser._id,
+        author_role: role || submittingUser.role,
+        status: "pending",
+        approval_required: 2,
+        approval_count: 0,
+      });
+
+      const savedPaper = await paper.save();
+      return { paperId: savedPaper._id };
+    } catch (error) {
+      console.error('Error creating research paper:', error);
+      throw error;
     }
-
-    // Insert research paper
-    const stmt = db.prepare(`
-      INSERT INTO research_papers
-      (title, authors, abstract, pdf_path, category, submitted_by, author_role, status, approval_required, approval_count, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP)
-    `);
-
-    const result = stmt.run(
-      title,
-      authors,
-      abstract,
-      pdfPath,
-      category,
-      submittedBy,
-      role,
-      status,
-      approvalRequired
-    );
-
-    return result; 
   }
 
-  static getAll({ authors, category, search, sort, status }) {
-    let query = `
-      SELECT rp.*,
-             c.name AS category
-      FROM research_papers rp
-      JOIN categories c ON rp.category = c.id
-      WHERE 1=1
-    `;
-    const params = [];
+  static async getAll({ authors, category, search, sort, status }) {
+    try {
+      let query = { status: status || 'approved' };
 
-    if (status) {
-      query += " AND rp.status = ?";
-      params.push(status);
-    } else {
-      query += " AND rp.status = 'approved'";
+      if (authors) {
+        query.authors = { $regex: authors, $options: 'i' };
+      }
+
+      if (category) {
+        query.category = category;
+      }
+
+      if (search) {
+        query.title = { $regex: search, $options: 'i' };
+      }
+
+      let sortOption = {};
+      switch (sort) {
+        case "citations":
+          sortOption = { citation_count: -1 };
+          break;
+        case "alphabetical":
+          sortOption = { title: 1 };
+          break;
+        case "recent":
+        default:
+          sortOption = { created_at: -1 };
+      }
+
+      return await db.ResearchPaper.find(query)
+        .populate('category', 'name')
+        .sort(sortOption);
+    } catch (error) {
+      console.error('Error getting research papers:', error);
+      throw error;
     }
-
-    if (authors) {
-      query += " AND rp.authors LIKE ?";
-      params.push(`%${authors}%`);
-    }
-
-    if (category) {
-      query += " AND rp.category = ?";
-      params.push(category);
-    }
-
-    if (search) {
-      query += " AND rp.title LIKE ?";
-      params.push(`%${search}%`);
-    }
-
-    switch (sort) {
-      case "citations":
-        query += " ORDER BY rp.citation_count DESC";
-        break;
-      case "alphabetical":
-        query += " ORDER BY rp.title COLLATE NOCASE ASC";
-        break;
-      case "recent":
-      default:
-        query += " ORDER BY rp.created_at DESC";
-    }
-
-    return db.prepare(query).all(...params);
   }
 
-  static incrementCitation(id) {
-    return db.prepare(`
-      UPDATE research_papers
-      SET citation_count = citation_count + 1
-      WHERE id = ?
-    `).run(id);
+  static async incrementCitation(id) {
+    try {
+      return await db.ResearchPaper.findByIdAndUpdate(id, { $inc: { citation_count: 1 } });
+    } catch (error) {
+      console.error('Error incrementing citation:', error);
+      throw error;
+    }
   }
 
-  static getByUserEmail(email, status) {
-    let query = `
-      SELECT * FROM research_papers
-      WHERE submitted_by = ?
-    `;
-    const params = [email];
+  static async getByUserEmail(email, status) {
+    try {
+      // First find the user by email to get their ID
+      const user = await db.User.findOne({ email });
+      if (!user) return [];
 
-    if (status) {
-      query += " AND status = ?";
-      params.push(status);
+      let query = { submitted_by: user._id };
+      if (status) {
+        query.status = status;
+      }
+
+      return await db.ResearchPaper.find(query)
+        .populate('category', 'name')
+        .sort({ created_at: -1 });
+    } catch (error) {
+      console.error('Error getting papers by user email:', error);
+      throw error;
     }
-
-    query += " ORDER BY created_at DESC";
-
-    return db.prepare(query).all(...params);
   }
 }
 

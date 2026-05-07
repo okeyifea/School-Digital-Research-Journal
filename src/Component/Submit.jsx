@@ -1,4 +1,4 @@
-import React , {useState}from "react";
+import React , { useState, useEffect } from "react";
 //import styled from "styled-components";
 //import Header from "./Header";
 import Layout from "./Common/layout";
@@ -31,7 +31,6 @@ const Submit = ({ user, setUser }) => {
     authors: "",
     category: "",
     abstract: "",
-    submittedBy: user?.email,
     pdf: null,
     confirm: false
   });
@@ -39,6 +38,7 @@ const Submit = ({ user, setUser }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [modal, setModal] = useState({ open: false, title: "", message: "" });
+  const [categories, setCategories] = useState([]);
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -49,7 +49,7 @@ const Submit = ({ user, setUser }) => {
     } else {
       setFormData({
         ...formData,
-        [name]: name === "category" ? (value ? Number(value) : "") : value
+        [name]: value
       });
     }
   };
@@ -60,55 +60,83 @@ const Submit = ({ user, setUser }) => {
     setMessage("");
 
     try {
+    const token = user?.token || localStorage.getItem("token");
+    if (!token) {
+      throw new Error("You must be logged in to submit a paper.");
+    }
+
     const data = new FormData();
     data.append("title", formData.title);
     data.append("authors", formData.authors);      
     data.append("abstract", formData.abstract);
-   data.append("category", formData.category);
-   data.append("submittedBy", formData.submittedBy);            
-   data.append("role", user.role);
-   data.append("pdf", formData.pdf);
-
-  for (let pair of data.entries()) {
-   console.log(pair[0], pair[1]);
- }
+    data.append("category", formData.category);
+    data.append("pdf", formData.pdf);
 
 
       const res = await fetch(`${API_URL}/api/research`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
         body: data
       });
 
       const result = await res.json();
-      setMessage(result.message || "Paper submitted");
-      if (res.ok) {
-        setModal({
-          open: true,
-          title: "Submission Successful",
-          message: result.message || "Paper submitted successfully"
-        });
-        setFormData({
-          title: "",
-          authors: "",
-          category: "",
-          abstract: "",
-          submittedBy: user?.email ,
-          pdf: null,
-          confirm: false
-        });
+      if (!res.ok) {
+        throw new Error(result.message || "Submission failed");
       }
+      setMessage(result.message || "Paper submitted");
+      setModal({
+        open: true,
+        title: "Submission Successful",
+        message: result.message || "Paper submitted successfully"
+      });
+      setFormData({
+        title: "",
+        authors: "",
+        category: "",
+        abstract: "",
+        pdf: null,
+        confirm: false
+      });
     } catch (err) {
       console.error(err);
-      setMessage("Submission failed");
+      setMessage(err.message || "Submission failed");
       setModal({
         open: true,
         title: "Submission Failed",
-        message: "Submission failed. Please try again."
+        message: err.message || "Submission failed. Please try again."
       });
     } finally {
       setLoading(false);
     }
   };
+
+  const handleReset = () => {
+    setFormData({
+      title: "",
+      authors: "",
+      category: "",
+      abstract: "",
+      pdf: null,
+      confirm: false
+    });
+    setMessage("");
+  };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/research/categories`);
+        const data = await res.json();
+        setCategories(Array.isArray(data) ? data : data?.data || []);
+      } catch (err) {
+        console.error("Error loading categories:", err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <Layout>
@@ -150,7 +178,7 @@ const Submit = ({ user, setUser }) => {
               </FormGroup>
 
               <FormGroup>
-                <Label htmlFor="category">Research Category *</Label>
+                <Label htmlFor="category">Faculty / College *</Label>
                 <Select
                   id="category"
                   name="category"
@@ -158,14 +186,12 @@ const Submit = ({ user, setUser }) => {
                   onChange={handleChange}
                   required
                 >
-                  <option value="">Select a category</option>
-                  <option value="1">Artificial Intelligence</option>
-                  <option value="2">Cloud Computing</option>
-                  <option value="3">Cybersecurity</option>
-                  <option value="4">Quantum Computing</option>
-                  <option value="5">Blockchain</option>
-                  <option value="6">Data Science</option>
-                  <option value="7">Other</option>
+                  <option value="">Select a faculty or college</option>
+                  {categories.map(category => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
                 </Select>
               </FormGroup>
 
@@ -212,7 +238,7 @@ const Submit = ({ user, setUser }) => {
                 <SubmitButton type="submit" disabled={loading}>
                   {loading ? "Submitting..." : "Submit Paper"}
                 </SubmitButton>
-                <ResetButton type="reset">Clear Form</ResetButton>
+                <ResetButton type="button" onClick={handleReset}>Clear Form</ResetButton>
               </ButtonGroup>
 
               {message && <p style={{ marginTop: "1rem" }}>{message}</p>}

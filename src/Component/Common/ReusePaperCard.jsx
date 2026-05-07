@@ -31,6 +31,7 @@ const PaperCard = ({
   onDelete,
   onResubmit
 }) => {
+  const paperId = paper._id || paper.id;
   const [comment, setComment] = useState("");
   const [error, setError] = useState("");
   const [resubmitFile, setResubmitFile] = useState(null);
@@ -81,7 +82,7 @@ const PaperCard = ({
 
   const handleApprove = () => {
     setError("");
-    onReview?.(paper.id, "approved");
+    onReview?.(paperId, "approved");
   };
 
   const handleReject = () => {
@@ -90,7 +91,7 @@ const PaperCard = ({
       return;
     }
     setError("");
-    onReview?.(paper.id, "rejected", comment.trim());
+    onReview?.(paperId, "rejected", comment.trim());
     setComment("");
   };
 
@@ -154,7 +155,7 @@ const PaperCard = ({
             accept="application/pdf"
             onChange={(e) => setResubmitFile(e.target.files?.[0] || null)}
           />
-          <Button onClick={() => onResubmit(paper.id, resubmitFile)}>
+          <Button onClick={() => onResubmit(paperId, resubmitFile)}>
             Resubmit
           </Button>
         </ResubmitRow>
@@ -162,7 +163,7 @@ const PaperCard = ({
 
       {canDelete && (
         <DeleteRow>
-          <DeleteButton onClick={() => onDelete?.(paper.id)}>
+          <DeleteButton onClick={() => onDelete?.(paperId)}>
             Delete Paper
           </DeleteButton>
         </DeleteRow>

@@ -4,6 +4,7 @@ import LoginCard from "./Component/LoginCard.jsx";
 import Home from "./Component/Home.jsx";
 import Profile from "./Component/Profile.jsx";
 import ForgottenPassword from "./Component/ForgottenPassword.jsx";
+import ResetPassword from "./Component/ResetPassword.jsx";
 import SignUpCard from "./Component/SignUp.jsx";
 import Archive from "./Component/Archive.jsx";
 import Submit from "./Component/Submit.jsx";
@@ -36,6 +37,7 @@ const App = () => {
           {/* Public routes */}
           <Route path="/login" element={<LoginCard setUser={setUser} />} />
           <Route path="/forgot-password" element={<ForgottenPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/sign-up" element={<SignUpCard />} />
 
           {/* Protected routes */}

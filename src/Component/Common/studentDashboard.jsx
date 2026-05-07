@@ -56,7 +56,7 @@ const StudentView = ({ papers, onDelete, onResubmit }) => {
 
     return list.map((paper) => (
       <PaperCard
-        key={paper.id}
+        key={paper._id || paper.id}
         paper={paper}
         allowDelete
         onDelete={onDelete}

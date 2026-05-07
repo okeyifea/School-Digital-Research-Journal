@@ -98,7 +98,7 @@ const Archive = ({ user, setUser }) => {
      ======================= */
   const categories = useMemo(() => {
     const uniqueCategories = new Set(
-      allPapers.map(p => p.category || "Uncategorized")
+      allPapers.map(p => p.category?.name || "Uncategorized")
     );
 
     return [
@@ -106,7 +106,7 @@ const Archive = ({ user, setUser }) => {
       ...Array.from(uniqueCategories).map(cat => ({
         id: cat,
         label: cat,
-        count: allPapers.filter(p => p.category === cat).length
+        count: allPapers.filter(p => (p.category?.name || "Uncategorized") === cat).length
       }))
     ];
   }, [allPapers]);
@@ -118,7 +118,9 @@ const Archive = ({ user, setUser }) => {
     let result = [...allPapers];
 
     if (selectedCategory !== "all") {
-      result = result.filter(p => p.category === selectedCategory);
+      result = result.filter(
+        p => (p.category?.name || "Uncategorized") === selectedCategory
+      );
     }
 
     if (searchQuery) {
@@ -211,7 +213,7 @@ const Archive = ({ user, setUser }) => {
 
           <ContentWrapper>
             <Sidebar>
-              <CategoryTitle>CATEGORIES</CategoryTitle>
+              <CategoryTitle>FACULTIES & COLLEGES</CategoryTitle>
               <CategoryList>
                 {categories.map(cat => (
                   <CategoryItem
@@ -233,7 +235,7 @@ const Archive = ({ user, setUser }) => {
               {filteredPapers.length ? (
                 <PapersList>
                   {visiblePapers.map(paper => (
-                    <PaperCard key={paper.id}>
+                    <PaperCard key={paper._id || paper.id}>
                       <PaperHeader>
                         <h3>{paper.title}</h3>
                         <Badge>
@@ -243,7 +245,7 @@ const Archive = ({ user, setUser }) => {
 
                       <PaperMeta>
                         <MetaItem><strong>Authors:</strong> {paper.authors}</MetaItem>
-                        <MetaItem><strong>Category:</strong> {paper.category || "Uncategorized"}</MetaItem>
+                        <MetaItem><strong>Faculty / College:</strong> {paper.category?.name || "Uncategorized"}</MetaItem>
                         <MetaItem><strong>Published:</strong> {new Date(paper.created_at).toLocaleDateString()}</MetaItem>
                         <MetaItem><strong>Citations:</strong> {paper.citation_count ?? 0}</MetaItem>
                       </PaperMeta>
@@ -254,8 +256,25 @@ const Archive = ({ user, setUser }) => {
                       </PaperAbstract>
 
                       <PaperActions>
-                        <ActionButton primary>View Full Paper</ActionButton>
-                        <ActionButton>Download PDF</ActionButton>
+                        <ActionButton
+                          as="a"
+                          href={`${API_URL}/${paper.pdf_path}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          primary
+                        >
+                          View Full Paper
+                        </ActionButton>
+                        <ActionButton
+                          onClick={() => {
+                            const link = document.createElement("a");
+                            link.href = `${API_URL}/${paper.pdf_path}`;
+                            link.download = `${paper.title}.pdf`;
+                            link.click();
+                          }}
+                        >
+                          Download PDF
+                        </ActionButton>
                       </PaperActions>
                     </PaperCard>
                   ))}

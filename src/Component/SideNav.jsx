@@ -33,7 +33,7 @@ const SideNav = ({ user, onLogout }) => {
       <TopSection>
         <Brand onClick={() => nav("/")}>
           <Logo>📚</Logo>
-          <Title>FACIT Journal</Title>
+          <Title>GOUNI Journal</Title>
         </Brand>
 
         <User>

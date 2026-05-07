@@ -13,7 +13,7 @@ const OfficerView = ({ data, onReview }) => {
       return <EmptyMessage>{emptyText}</EmptyMessage>;
     }
     return list.map((paper) => (
-      <PaperCard key={paper.id} paper={paper} showActions onReview={onReview} />
+      <PaperCard key={paper._id || paper.id} paper={paper} showActions onReview={onReview} />
     ));
   };
 

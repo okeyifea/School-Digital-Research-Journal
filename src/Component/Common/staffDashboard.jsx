@@ -77,7 +77,7 @@ const StaffView = ({ data, onReview, onResubmit, onDelete }) => {
               ) : (
                 section.papers.map(paper => (
                   <PaperCard
-                    key={paper.id}
+                    key={paper._id || paper.id}
                     paper={paper}
                     showActions={section.showActions}
                     onReview={onReview}

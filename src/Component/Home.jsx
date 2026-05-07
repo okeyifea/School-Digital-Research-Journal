@@ -59,12 +59,12 @@ const Home = ({ user, setUser }) => {
       <Main>
         <HomeText>
           <p style={{ fontSize: "35px", fontWeight: "800", margin: "0" }}>
-            FACULTY OF COMPUTING AND INFORMATION TECHNOLOGY
-          </p>
-          <p style={{ fontSize: "25px", margin: "10px" }}>
             GODFREY OKOYE UNIVERSITY
           </p>
-          <p>Digital Research & Journal Archive</p>
+          <p style={{ fontSize: "25px", margin: "10px" }}>
+            Digital Research & Journal Archive
+          </p>
+          <p>Academic Excellence Platform</p>
         </HomeText>
 
         <SearchBar>
@@ -89,7 +89,7 @@ const Home = ({ user, setUser }) => {
           {papers.length === 0 && <p>No publications found.</p>}
 
           {papers.map(paper => (
-            <div className="article-card" key={paper.id}>
+            <div className="article-card" key={paper._id || paper.id}>
               <h3>{paper.title}</h3>
               <p>Author: {paper.authors}</p>
               <p>Published: {new Date(paper.created_at).toLocaleDateString()}</p>

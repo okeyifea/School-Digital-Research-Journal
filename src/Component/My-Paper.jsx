@@ -29,20 +29,9 @@ import{
 import Layout from "./Common/layout";
 import { API_URL } from "../../server/API/Auth.js";
 
-const CATEGORY_LABELS = {
-  1: "Artificial Intelligence",
-  2: "Cloud Computing",
-  3: "Cybersecurity",
-  4: "Quantum Computing",
-  5: "Blockchain",
-  6: "Data Science",
-  7: "Other"
-};
-
 const formatCategoryLabel = (value) => {
   if (value === null || value === undefined || value === "") return "Uncategorized";
-  const key = typeof value === "number" ? value : Number(value);
-  return CATEGORY_LABELS[key] || String(value);
+  return value?.name || String(value);
 };
 
 const MyPaper = ({ user, setUser }) => {
@@ -82,22 +71,24 @@ const MyPaper = ({ user, setUser }) => {
 
   // Compute categories from user's papers
   const categories = useMemo(() => {
-    const catSet = new Set(allPapers.map(p => p.category || "Uncategorized"));
+    const catSet = new Set(allPapers.map(p => p.category?.name || "Uncategorized"));
     const cats = ["all", ...Array.from(catSet)];
     return cats.map(cat => ({
       id: cat,
-      label: cat === "all" ? "All Papers" : formatCategoryLabel(cat),
+      label: cat === "all" ? "All Papers" : cat,
       count:
         cat === "all"
           ? allPapers.length
-          : allPapers.filter(p => (p.category || "Uncategorized") === cat).length
+          : allPapers.filter(p => (p.category?.name || "Uncategorized") === cat).length
     }));
   }, [allPapers]);
 
   // Derived papers based on selected category
   const filteredPapers = useMemo(() => {
     if (selectedCategory === "all") return allPapers;
-    return allPapers.filter(p => (p.category || "Uncategorized") === selectedCategory);
+    return allPapers.filter(
+      p => (p.category?.name || "Uncategorized") === selectedCategory
+    );
   }, [allPapers, selectedCategory]);
 
   const startIndex = currentPage * papersPerPage;
@@ -120,7 +111,7 @@ const MyPaper = ({ user, setUser }) => {
             </Header><ContentWrapper>
                 {/* Category Filter */}
                 <Sidebar>
-                  <CategoryTitle>Filter by Category</CategoryTitle>
+                  <CategoryTitle>Filter by Faculty / College</CategoryTitle>
                   <CategoryList>
                     {categories.map(cat => (
                       <CategoryItem
@@ -137,9 +128,9 @@ const MyPaper = ({ user, setUser }) => {
 
                 <PapersSection>
                   {filteredPapers.length ? (
-                    <PapersList>
-                      {visiblePapers.map(paper => (
-                        <PaperCard key={paper.id}>
+                      <PapersList>
+                        {visiblePapers.map(paper => (
+                        <PaperCard key={paper._id || paper.id}>
                           <PaperHeader>
                             <h3>{paper.title}</h3>
                             <Badge>{new Date(paper.created_at).getFullYear()}</Badge>
@@ -147,7 +138,7 @@ const MyPaper = ({ user, setUser }) => {
 
                           <PaperMeta>
                             <MetaItem><strong>Authors:</strong> {paper.authors}</MetaItem>
-                            <MetaItem><strong>Category:</strong> {formatCategoryLabel(paper.category)}</MetaItem>
+                            <MetaItem><strong>Faculty / College:</strong> {formatCategoryLabel(paper.category)}</MetaItem>
                             <MetaItem><strong>Published:</strong> {new Date(paper.created_at).toLocaleDateString()}</MetaItem>
                             <MetaItem><strong>Citations:</strong> {paper.citation_count ?? 0}</MetaItem>
                           </PaperMeta>
