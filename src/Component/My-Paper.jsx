@@ -28,6 +28,7 @@ import{
 
 import Layout from "./Common/layout";
 import { API_URL } from "../../server/API/Auth.js";
+import { buildDocumentUrl, downloadDocument } from "../utils/document.js";
 
 const formatCategoryLabel = (value) => {
   if (value === null || value === undefined || value === "") return "Uncategorized";
@@ -151,19 +152,22 @@ const MyPaper = ({ user, setUser }) => {
                           {paper.pdf_path && (
                             <PaperActions>
                               <ActionButton
-                                href={`${API_URL}/${paper.pdf_path}`}
+                                as="a"
+                                href={buildDocumentUrl(API_URL, paper.pdf_path)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
                                 View PDF
                               </ActionButton>
                               <ActionButton
-                                onClick={() => {
-                                  const link = document.createElement("a");
-                                  link.href = `${API_URL}/${paper.pdf_path}`;
-                                  link.download = `${paper.title}.pdf`;
-                                  link.click();
-                                } }
+                                style={{ marginTop: "0px" }}
+                                onClick={async () => {
+                                  try {
+                                    await downloadDocument(API_URL, paper.pdf_path, `${paper.title}.pdf`);
+                                  } catch (error) {
+                                    console.error("Download failed:", error);
+                                  }
+                                }}
                               >
                                 Download
                               </ActionButton>

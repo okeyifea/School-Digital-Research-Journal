@@ -49,7 +49,6 @@ const Dashboard = ({ user, setUser }) => {
     const storedUser = JSON.parse(localStorage.getItem("user") || "null");
     const token = storedUser?.token || localStorage.getItem("token");
 
-    console.log("The token:", token)
     try {
       const res = await fetch(`${API_URL}/api/review`, {
         method: "POST",

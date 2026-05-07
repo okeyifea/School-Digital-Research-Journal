@@ -1,4 +1,7 @@
+import fs from "fs";
 import mongoose from "mongoose";
+import path from "path";
+import { fileURLToPath } from "url";
 import db from "../db.js";
 
 const TOTAL_PAPERS = 30;
@@ -7,6 +10,20 @@ const FIXED_EMAILS = [
   "staff1@example.com",
   "officer1@example.com",
 ];
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const uploadsDir = path.resolve(__dirname, "..", "..", "uploads");
+const minimalPdfBuffer = Buffer.from(
+  "%PDF-1.1\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Count 1/Kids[3 0 R]>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 144]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj\n4 0 obj<</Length 65>>stream\nBT /F1 18 Tf 36 96 Td (FACIT Journal Sample Paper) Tj ET\nendstream\nendobj\n5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\nxref\n0 6\n0000000000 65535 f \n0000000010 00000 n \n0000000063 00000 n \n0000000122 00000 n \n0000000248 00000 n \n0000000363 00000 n \ntrailer<</Size 6/Root 1 0 R>>\nstartxref\n433\n%%EOF\n"
+);
+
+const ensureSamplePdf = (filename) => {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  const filePath = path.join(uploadsDir, filename);
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, minimalPdfBuffer);
+  }
+};
 
 const randomEmail = () => {
   const names = ["john", "mary", "ade", "chioma", "ahmed", "grace"];
@@ -66,13 +83,15 @@ const main = async () => {
     FIXED_EMAILS.forEach((email, index) => {
       const user = usersByEmail.get(email);
       const category = categories[index % categories.length];
+      const filename = `guaranteed-paper-${index + 1}.pdf`;
+      ensureSamplePdf(filename);
 
       papers.push({
         title: `Guaranteed Paper by ${email}`,
         authors: `Author ${index + 1}`,
         abstract:
           "This paper guarantees that required test emails exist in the database.",
-        pdf_path: `/uploads/guaranteed-paper-${index + 1}.pdf`,
+        pdf_path: `/uploads/${filename}`,
         category: category._id,
         submitted_by: user._id,
         author_role: user.role || buildAuthorRole(email),
@@ -89,13 +108,15 @@ const main = async () => {
       const submitter =
         submittedByPool[Math.floor(Math.random() * submittedByPool.length)];
       const isApproved = Math.random() > 0.4;
+      const filename = `sample-paper-${index + 1}.pdf`;
+      ensureSamplePdf(filename);
 
       papers.push({
         title: `Sample Research Paper ${index + 1}`,
         authors: `Author ${index + 1}, Co-Author ${index + 2}`,
         abstract:
           "This is a dummy abstract used for testing archive filters, categories, and UI rendering.",
-        pdf_path: `/uploads/sample-paper-${index + 1}.pdf`,
+        pdf_path: `/uploads/${filename}`,
         category: category._id,
         submitted_by: submitter._id,
         author_role: submitter.role || buildAuthorRole(submitter.email),

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { API_URL } from "../../../server/API/Auth.js";
+import { buildDocumentUrl } from "../../utils/document.js";
 import {
   Card,
   Title,
@@ -98,6 +99,7 @@ const PaperCard = ({
   return (
     <Card>
       <Title>{paper.title}</Title>
+
       <Meta>
         <Status>Status: {paper.status}</Status>
         {paper.author_role !== "staff" && (
@@ -119,7 +121,7 @@ const PaperCard = ({
       {paper.pdf_path && (
         <div>
           <Link
-            href={`${API_URL}/${paper.pdf_path}`}
+            href={buildDocumentUrl(API_URL, paper.pdf_path)}
             target="_blank"
             rel="noopener noreferrer"
           >

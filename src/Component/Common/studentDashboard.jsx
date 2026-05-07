@@ -72,22 +72,22 @@ const StudentView = ({ papers, onDelete, onResubmit }) => {
           onClick={() => setActiveGroup("pendingStaff")}
           $active={activeGroup === "pendingStaff"}
         >
-          Under Review
+          Under Review ({groups.pendingStaff.length})
         </Tab>
 
         <Tab
           onClick={() => setActiveGroup("pendingOfficer")}
           $active={activeGroup === "pendingOfficer"}
         >
-          Awaiting Officer Approval
+          Awaiting Officer Approval ({groups.pendingOfficer.length})
         </Tab>
 
         <Tab onClick={() => setActiveGroup("approved")} $active={activeGroup === "approved"}>
-          Review Completed
+          Review Completed ({groups.approved.length})
         </Tab>
 
         <Tab onClick={() => setActiveGroup("rejected")} $active={activeGroup === "rejected"}>
-          Rejected Submissions
+          Rejected Submissions ({groups.rejected.length})
         </Tab>
       </Tabs>
 

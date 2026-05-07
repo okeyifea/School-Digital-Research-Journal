@@ -193,7 +193,7 @@ const SignUp = () => {
         <BrandContainer>
         <BrandSection>
           <BrandLogo>📚</BrandLogo>
-          <BrandTitle>FACIT Journal</BrandTitle>
+          <BrandTitle>GOUNI Journal</BrandTitle>
           <BrandSubtitle>Academic Excellence Platform</BrandSubtitle>
         </BrandSection>
         <FeatureList>

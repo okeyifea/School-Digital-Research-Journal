@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { API_URL } from "../../../server/API/Auth.js";
+import { buildDocumentUrl, downloadDocument } from "../../utils/document.js";
 
 const SearchResultsModal = ({ show, onClose, searchQuery, results }) => {
   if (!show) return null;
@@ -32,18 +33,19 @@ const SearchResultsModal = ({ show, onClose, searchQuery, results }) => {
               </MetaRow>
               <Actions>
                 <ActionLink
-                  href={`${API_URL}/${paper.pdf_path}`}
+                  href={buildDocumentUrl(API_URL, paper.pdf_path)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   Read More
                 </ActionLink>
                 <ActionButton
-                  onClick={() => {
-                    const link = document.createElement("a");
-                    link.href = `${API_URL}/${paper.pdf_path}`;
-                    link.download = `${paper.title}.pdf`;
-                    link.click();
+                  onClick={async () => {
+                    try {
+                      await downloadDocument(API_URL, paper.pdf_path, `${paper.title}.pdf`);
+                    } catch (error) {
+                      console.error("Download failed:", error);
+                    }
                   }}
                 >
                   Download

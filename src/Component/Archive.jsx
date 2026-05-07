@@ -34,6 +34,7 @@ import {
 } from "../Style/ArchiveStyle.jsx";
 
 import { API_URL } from "../../server/API/Auth.js";
+import { buildDocumentUrl, downloadDocument } from "../utils/document.js";
 
 const Archive = ({ user, setUser }) => {
   /* =======================
@@ -206,6 +207,8 @@ const Archive = ({ user, setUser }) => {
 
           {showModal && (
             <SearchResultsModal
+              show={showModal}
+              searchQuery={searchInput}
               results={modalResults}
               onClose={() => setShowModal(false)}
             />
@@ -258,7 +261,7 @@ const Archive = ({ user, setUser }) => {
                       <PaperActions>
                         <ActionButton
                           as="a"
-                          href={`${API_URL}/${paper.pdf_path}`}
+                          href={buildDocumentUrl(API_URL, paper.pdf_path)}
                           target="_blank"
                           rel="noopener noreferrer"
                           primary
@@ -266,11 +269,13 @@ const Archive = ({ user, setUser }) => {
                           View Full Paper
                         </ActionButton>
                         <ActionButton
-                          onClick={() => {
-                            const link = document.createElement("a");
-                            link.href = `${API_URL}/${paper.pdf_path}`;
-                            link.download = `${paper.title}.pdf`;
-                            link.click();
+                          style={{ marginTop: "0px" }}
+                          onClick={async () => {
+                            try {
+                              await downloadDocument(API_URL, paper.pdf_path, `${paper.title}.pdf`);
+                            } catch (error) {
+                              console.error("Download failed:", error);
+                            }
                           }}
                         >
                           Download PDF

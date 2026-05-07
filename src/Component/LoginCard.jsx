@@ -70,7 +70,7 @@ const LoginCard = ({ setUser }) => {
       <LoginContainer>
         <div className="login-head">
           <h2>LOGIN</h2>
-          <p>Welcome back to FACIT Journal Platform</p>
+          <p>Welcome back to GOUNI Journal Platform</p>
         </div>
 
         {error && <p style={{ color: "red" }}>{error}</p>}

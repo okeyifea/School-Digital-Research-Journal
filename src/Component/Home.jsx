@@ -7,6 +7,7 @@ import {
   PublishedPapers
 } from "../Style/HomeStyle.jsx";
 import { API_URL } from "../../server/API/Auth.js";
+import { buildDocumentUrl, downloadDocument } from "../utils/document.js";
 import Layout from "./Common/layout";
 import SideNav from "./SideNav";
 import SearchResultsModal from "./Modals/SearchResultModal.jsx";
@@ -101,14 +102,15 @@ const Home = ({ user, setUser }) => {
                   {paper.abstract.length > 200 ? paper.abstract.substring(0, 200) + "..." : paper.abstract}
                 </h4>
               </span>
-              <a href={`${API_URL}/${paper.pdf_path}`} target="_blank" rel="noopener noreferrer">
+              <a href={buildDocumentUrl(API_URL, paper.pdf_path)} target="_blank" rel="noopener noreferrer">
                 Read More
               </a>
-              <button onClick={() => {
-                const link = document.createElement("a");
-                link.href = `${API_URL}/${paper.pdf_path}`;
-                link.download = paper.title + ".pdf";
-                link.click();
+              <button onClick={async () => {
+                try {
+                  await downloadDocument(API_URL, paper.pdf_path, `${paper.title}.pdf`);
+                } catch (error) {
+                  console.error("Download failed:", error);
+                }
               }}>Download</button>
               </div>
           ))}
