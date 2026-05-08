@@ -149,11 +149,13 @@ A comprehensive academic research journal management system for Godfrey Okoye Un
 ## Deploy to Vercel
 
 1. Install the Vercel CLI if needed:
+
    ```bash
    npm install -g vercel
    ```
 
 2. Log in to Vercel and link the project:
+
    ```bash
    vercel login
    vercel
