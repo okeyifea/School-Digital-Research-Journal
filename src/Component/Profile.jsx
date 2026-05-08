@@ -36,7 +36,7 @@ import {
 import ProfileIcon from "./Common/Icons/profile-user.svg"
 
 import Layout from "./Common/layout";
-import { API_URL } from "../../server/API/Auth.js";
+import { API_URL } from "../api/Auth.js";
 import { useToast } from "./Common/Toast.jsx";
 
 const Profile = ({ user, setUser }) => {

@@ -6,7 +6,7 @@ import {
   LatestPublicationHeader,
   PublishedPapers
 } from "../Style/HomeStyle.jsx";
-import { API_URL } from "../../server/API/Auth.js";
+import { API_URL } from "../api/Auth.js";
 import { buildDocumentUrl, downloadDocument } from "../utils/document.js";
 import Layout from "./Common/layout";
 import SearchResultsModal from "./Modals/SearchResultModal.jsx";

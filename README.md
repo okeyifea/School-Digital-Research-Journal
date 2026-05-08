@@ -146,6 +146,33 @@ A comprehensive academic research journal management system for Godfrey Okoye Un
    - Backend API: http://localhost:5000
    - When the backend starts successfully, it will connect to MongoDB and seed the default categories and sample users automatically.
 
+## Deploy to Vercel
+
+1. Install the Vercel CLI if needed:
+   ```bash
+   npm install -g vercel
+   ```
+
+2. Log in to Vercel and link the project:
+   ```bash
+   vercel login
+   vercel
+   ```
+
+3. Set production environment variables in the Vercel dashboard:
+   - `MONGODB_URI` — your MongoDB Atlas connection string
+   - `JWT_SECRET` — strong JWT signing secret
+   - `FRONTEND_URL` — your Vercel app URL (e.g. `https://your-app.vercel.app`)
+   - `EMAIL_FROM`, `EMAIL_USER`, `EMAIL_PASS` or `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`
+   - `VITE_API_URL` — optional for local development only; production uses relative `/api` paths by default
+
+4. Deploy:
+   ```bash
+   vercel --prod
+   ```
+
+> For local development, keep `VITE_API_URL=http://localhost:5000` in your `.env` file so the React app can proxy API calls properly.
+
 ## Quick Start On Windows
 
 Open two PowerShell terminals in the project folder.
@@ -183,7 +210,7 @@ The system comes with pre-seeded users for testing:
 ### Authentication
 
 - `POST /api/auth/signup` - User registration
-- `POST /login` - User login
+- `POST /api/auth/login` - User login
 - `POST /api/auth/forgot-password` - Password reset request
 - `POST /api/auth/reset-password/:token` - Password reset completion
 

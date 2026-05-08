@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { API_URL } from "../../server/API/Auth";
+import { API_URL } from "../api/Auth.js";
 import Modal from "./Common/Modal.jsx";
 
 const ResetPassword = () => {

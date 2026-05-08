@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { API_URL } from "../../server/API/Auth";
+import { API_URL } from "../api/Auth.js";
 
 import StaffView from "./Common/staffDashboard.jsx";
 import StudentView from "./Common/studentDashboard.jsx";

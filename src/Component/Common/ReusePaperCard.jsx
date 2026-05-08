@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { API_URL } from "../../../server/API/Auth.js";
+import { API_URL } from "../../api/Auth.js";
 import { buildDocumentUrl } from "../../utils/document.js";
 import {
   Card,

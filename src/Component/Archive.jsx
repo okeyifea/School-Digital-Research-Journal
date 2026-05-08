@@ -32,7 +32,7 @@ import {
   ViewMoreButton
 } from "../Style/ArchiveStyle.jsx";
 
-import { API_URL } from "../../server/API/Auth.js";
+import { API_URL } from "../api/Auth.js";
 import { buildDocumentUrl, downloadDocument } from "../utils/document.js";
 
 const Archive = ({ user, setUser }) => {

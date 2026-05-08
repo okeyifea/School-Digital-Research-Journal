@@ -34,7 +34,7 @@ import {
   ErrorMsg,
   Spinner,
 } from "../Style/SignUpStyle.jsx"
-import { signupUser } from "../../server/API/Auth.js";
+import { signupUser } from "../api/Auth.js";
 import Modal from "./Common/Modal.jsx";
 
 const SignUp = () => {

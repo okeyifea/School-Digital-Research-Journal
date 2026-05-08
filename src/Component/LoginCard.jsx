@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../../server/API/Auth.js";
+import { loginUser } from "../api/Auth.js";
 import { LoginCard as StyledLoginCard, LoginContainer } from "../Style/LoginCardStyle.jsx";
 import { useToast } from "./Common/Toast.jsx";
 import Modal from "./Common/Modal.jsx";

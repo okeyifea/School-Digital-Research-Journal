@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { API_URL } from "../../../server/API/Auth.js";
+import { API_URL } from "../../api/Auth.js";
 import { buildDocumentUrl, downloadDocument } from "../../utils/document.js";
 
 const SearchResultsModal = ({ show, onClose, searchQuery, results }) => {

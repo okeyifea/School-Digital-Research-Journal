@@ -21,7 +21,7 @@ import {
   ResetButton
 } from "../Style/SubmitStyle.jsx";
 
-import { API_URL } from "../../server/API/Auth.js";
+import { API_URL } from "../api/Auth.js";
 
 
 const Submit = ({ user, setUser }) => {
