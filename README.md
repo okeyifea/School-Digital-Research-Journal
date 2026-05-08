@@ -173,6 +173,35 @@ A comprehensive academic research journal management system for Godfrey Okoye Un
    vercel --prod
    ```
 
+## Separate Frontend and Backend Deployment
+
+This repository now supports separate deployments for frontend and backend.
+
+### Frontend deployment (root project)
+
+- Deploy from the repository root.
+- Root `vercel.json` builds only the Vite frontend.
+- Frontend environment variables should include:
+  - `VITE_API_URL=https://<backend-url>`
+  - `FRONTEND_URL=https://<frontend-url>`
+
+### Backend deployment (server project)
+
+- Deploy from `server/` as a separate Vercel project.
+- The backend entry is `server/api/[...slug].js`, which forwards all `/api/*` requests to Express.
+- Backend environment variables should include:
+  - `MONGODB_URI` — your MongoDB Atlas connection string
+  - `JWT_SECRET` — strong JWT signing secret
+  - `EMAIL_FROM`, `EMAIL_USER`, `EMAIL_PASS` or `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`
+
+### Recommended flow
+
+1. Deploy backend from `server/` first.
+2. Copy the backend URL into the frontend project as `VITE_API_URL`.
+3. Deploy frontend from the repository root.
+
+> With this setup, the frontend and backend are completely separate Vercel projects, each with its own environment variables and deployment lifecycle.
+
 > For local development, keep `VITE_API_URL=http://localhost:5000` in your `.env` file so the React app can proxy API calls properly.
 
 ## Quick Start On Windows

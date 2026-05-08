@@ -1,0 +1,6 @@
+server/
+api/
+.env
+README.md
+node_modules/
+*.log
