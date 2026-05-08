@@ -22,7 +22,7 @@ import HomeIcon from "../Component/Common/Icons/Home Icon.svg";
 import ArchiveIcon from "../Component/Common/Icons/Archive Icon.svg";
 import SubmitIcon from "../Component/Common/Icons/Submit Icon.svg";
 import ProfileIcon from "../Component/Common/Icons/User Icon.svg";
-import ApprovalIcon from "../Component/Common/Icons/Approval Icon.svg";
+import ApprovalIcon from "../Component/Common/Icons/Approval icon.svg";
 import DashboardIcon from "./Common/Icons/dashboard.svg"
 
 const SideNav = ({ user, onLogout }) => {
