@@ -159,4 +159,5 @@ export const initializeDatabase = async () => {
   global.__dbInitialized = true;
 };
 
+export { app };
 export default app;

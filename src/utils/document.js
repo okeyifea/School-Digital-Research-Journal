@@ -10,6 +10,10 @@ export const buildDocumentUrl = (apiUrl, pdfPath) => {
     .replace(/\\/g, "/")
     .replace(/^\/+/, "");
 
+  if (normalizedPath.startsWith("uploads/")) {
+    return `/${normalizedPath}`;
+  }
+
   return `${normalizedApiUrl}/${normalizedPath}`;
 };
 

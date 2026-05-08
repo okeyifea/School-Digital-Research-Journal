@@ -48,7 +48,7 @@ const MyPaper = ({ user, setUser }) => {
     setLoading(true);
     try {
       const res = await fetch(
-        `${API_URL}/api/research/my-papers?email=${encodeURIComponent(user.email)}&status=approved`,
+        `${API_URL}/research/my-papers?email=${encodeURIComponent(user.email)}&status=approved`,
         { signal }
       );
       const data = await res.json();

@@ -27,7 +27,7 @@ const Dashboard = ({ user, setUser }) => {
 
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/api/dashboard/${user.role}`, {
+      const res = await fetch(`${API_URL}/dashboard/${user.role}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const result = await res.json();
@@ -50,7 +50,7 @@ const Dashboard = ({ user, setUser }) => {
     const token = storedUser?.token || localStorage.getItem("token");
 
     try {
-      const res = await fetch(`${API_URL}/api/review`, {
+      const res = await fetch(`${API_URL}/review`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,7 +96,7 @@ const Dashboard = ({ user, setUser }) => {
           onClick: async () => {
             setModal({ open: false, title: "", message: "", actions: null });
             try {
-              const res = await fetch(`${API_URL}/api/research/${paperId}`, {
+              const res = await fetch(`${API_URL}/research/${paperId}`, {
                 method: "DELETE",
                 headers: {
                   Authorization: `Bearer ${token}`
@@ -170,7 +170,7 @@ const Dashboard = ({ user, setUser }) => {
     try {
       const data = new FormData();
       data.append("pdf", file);
-      const res = await fetch(`${API_URL}/api/research/${paperId}/resubmit`, {
+      const res = await fetch(`${API_URL}/research/${paperId}/resubmit`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`
@@ -209,8 +209,8 @@ const Dashboard = ({ user, setUser }) => {
   };
 
   if (!user) return <p>Please log in to view the dashboard.</p>;
-  if (loading) return <p>Loading dashboard...</p>;
-
+  if (loading) return <p style={{display: "flex", textAlign: "center", justifyContent: "center"}}>Loading dashboard...</p>;
+  
   return (
     <Layout user={user} setUser={setUser}>
       <div style={{ padding: "20px" }}>

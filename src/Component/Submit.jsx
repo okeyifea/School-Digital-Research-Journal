@@ -72,7 +72,7 @@ const Submit = ({ user, setUser }) => {
     data.append("pdf", formData.pdf);
 
 
-      const res = await fetch(`${API_URL}/api/research`, {
+      const res = await fetch(`${API_URL}/research`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`
@@ -126,7 +126,7 @@ const Submit = ({ user, setUser }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/research/categories`);
+        const res = await fetch(`${API_URL}/research/categories`);
         const data = await res.json();
         setCategories(Array.isArray(data) ? data : data?.data || []);
       } catch (err) {

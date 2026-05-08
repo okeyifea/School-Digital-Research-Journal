@@ -19,7 +19,7 @@ const Home = ({ user, setUser }) => {
 
   // Fetch all papers
   const fetchPapers = () => {
-    fetch(`${API_URL}/api/research?status=approved`)
+    fetch(`${API_URL}/research?status=approved`)
       .then(res => res.json())
       .then(data => {
         const papersList = Array.isArray(data) ? data : data?.data || [];
@@ -39,7 +39,7 @@ const Home = ({ user, setUser }) => {
 
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
-    fetch(`${API_URL}/api/research?status=approved&search=${searchQuery}`)
+    fetch(`${API_URL}/research?status=approved&search=${searchQuery}`)
       .then(res => res.json())
       .then(data => {
         const results = Array.isArray(data) ? data : data?.data || [];

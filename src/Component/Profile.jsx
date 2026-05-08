@@ -126,7 +126,7 @@ const Profile = ({ user, setUser }) => {
     try {
       const token = JSON.parse(localStorage.getItem("user"))?.token;
 
-      const res = await fetch(`${API_URL}/api/auth/update-password`, {
+      const res = await fetch(`${API_URL}/auth/update-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

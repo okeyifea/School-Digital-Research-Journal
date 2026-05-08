@@ -56,7 +56,7 @@ const Archive = ({ user, setUser }) => {
      ======================= */
   const fetchApprovedPapers = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/research?status=approved`);
+      const res = await fetch(`${API_URL}/research?status=approved`);
       const data = await res.json();
       setAllPapers(Array.isArray(data) ? data : data?.data || []);
     } catch (error) {
@@ -83,7 +83,7 @@ const Archive = ({ user, setUser }) => {
      sort: sortBy
    });
 
-   fetch(`${API_URL}/api/research?${query.toString()}`)
+   fetch(`${API_URL}/research?${query.toString()}`)
     .then(res => res.json())
     .then(data => {
       setModalResults(Array.isArray(data) ? data : data?.data || []);
