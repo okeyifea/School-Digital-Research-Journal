@@ -4,9 +4,9 @@ import styled from "styled-components";
 // Styled Components
 export const SignUpPage = styled.div`
   display: flex;
-  height: 100vh;        
-  overflow: hidden;     
+  min-height: 100vh;
   margin: 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 
   @media (max-width: 1024px) {
     flex-direction: column;
@@ -20,8 +20,7 @@ export const LeftSection = styled.div`
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
-  overflow-y: auto;       
-  max-height: 100vh;     
+  overflow-y: auto;
 
   @media (max-width: 768px) {
     display: none;
@@ -82,14 +81,17 @@ export const RightSection = styled.div`
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
+  box-sizing: border-box;
 
   @media (max-width: 1024px) {
-    min-height: 100vh;
+    min-height: auto;
+    padding: 24px 16px 32px;
   }
 `;
 
 export const FormContainer = styled.div`
   width: 100%;
+  max-width: 760px;
   height: auto;
   background: rgba(30, 41, 59, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.1);

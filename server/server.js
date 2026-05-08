@@ -86,7 +86,7 @@ app.post("/login", async (req, res) => {
 });
 
 const handleSignup = async (req, res) => {
-  console.log("Signup request received:", req.body);
+  
 
   const {
     username,
@@ -163,7 +163,6 @@ const handleSignup = async (req, res) => {
 
     await newUser.save();
 
-    console.log(`User ${username} registered successfully`);
 
     return res.status(201).json({
       success: true,

@@ -299,7 +299,6 @@ const seedCategories = async () => {
     const count = await Category.countDocuments();
     if (count === 0) {
       await Category.insertMany(COLLEGES.map(name => ({ name })));
-      console.log('Categories seeded successfully');
     }
   } catch (error) {
     console.error('Error seeding categories:', error);
@@ -312,7 +311,6 @@ const seedUsers = async () => {
     const count = await User.countDocuments();
     if (count === 0) {
       await User.insertMany(defaultUsers);
-      console.log('Users seeded successfully');
       return;
     }
 

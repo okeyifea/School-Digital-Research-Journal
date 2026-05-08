@@ -3,12 +3,14 @@ import styled from "styled-components";
 export const Main = styled.main``;
 
 export const HomeText = styled.div`
- width:100%;
- display: flex;
+  width: 100%;
+  max-width: 1100px;
+  box-sizing: border-box;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 30px;
+  margin: 30px auto;
   border-radius: 40px;
   padding: 40px 20px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -17,7 +19,7 @@ export const HomeText = styled.div`
   overflow: hidden;
 
   @media (max-width: 768px) {
-    margin: 20px 15px;
+    margin: 20px auto;
     padding: 30px 15px;
     border-radius: 20px;
   }
@@ -52,7 +54,8 @@ export const HomeText = styled.div`
 `;
 
 export const SearchBar = styled.div`
-  width: auto;
+  width: 100%;
+  max-width: 1100px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,7 +71,8 @@ export const SearchBar = styled.div`
   }
 
   .search_bar {
-   height: 60px;
+    width: 100%;
+    min-height: 60px;
     display: flex;
     justify-content: center;
     gap: 12px;
@@ -80,9 +84,17 @@ export const SearchBar = styled.div`
     transition: all 0.3s ease;
 
     @media (max-width: 768px) {
-      height: 50px;
+      min-height: 50px;
       padding: 6px 15px;
-      flex-wrap: wrap;
+      width: 100%;
+      flex-wrap: nowrap;
+    }
+
+    @media (max-width: 560px) {
+      flex-direction: column;
+      align-items: stretch;
+      border-radius: 24px;
+      padding: 14px;
     }
 
     &:hover {
@@ -107,15 +119,12 @@ export const SearchBar = styled.div`
       color: #333;
       padding: 8px 12px;
       width: 400px;
+      min-width: 0;
 
       @media (max-width: 768px) {
-        width: 250px;
+        width: 100%;
         font-size: 14px;
         padding: 6px 8px;
-      }
-
-      @media (max-width: 480px) {
-        width: 200px;
       }
 
       &::placeholder {
@@ -182,11 +191,13 @@ export const PublishedPapers = styled.div`
   gap: 30px;
   flex-direction: column;
   margin-top: 40px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: auto;
+  margin-right: auto;
   width: 100%;
+  max-width: 1100px;
   flex-wrap: wrap;
   padding: 20px;
+  box-sizing: border-box;
 
   .article-card {
     display: flex;
@@ -195,8 +206,8 @@ export const PublishedPapers = styled.div`
     border: none;
     border-radius: 12px;
     padding: 25px;
-    width: 1000px;
-    max-width: 1200px;
+    width: 100%;
+    max-width: 100%;
     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
@@ -242,6 +253,7 @@ export const PublishedPapers = styled.div`
       font-weight: 700;
       color: #fff;
       letter-spacing: 0.3px;
+      word-break: break-word;
     }
 
     h4 {

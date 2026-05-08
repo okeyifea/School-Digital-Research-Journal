@@ -16,12 +16,12 @@ export const Container = styled.aside`
   top: 0;
     z-index: 100;
 
-  @media (max-width: 900px) {
+  @media (max-width: 960px) {
     width: 220px;
     min-width: 200px;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 820px) {
     position: fixed;
     width: 100%;
     height: auto;
@@ -40,7 +40,7 @@ export const TopSection = styled.div`
   overflow-y: auto;
   padding-right: 4px;
 
-  @media (max-width: 640px) {
+  @media (max-width: 820px) {
     flex-direction: row;
     align-items: center;
     gap: 8px;
@@ -62,7 +62,7 @@ export const Brand = styled.div`
   border-radius: 6px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
-  @media (max-width: 640px) {
+  @media (max-width: 820px) {
     margin-bottom: 0;
     flex-shrink: 0;
   }
@@ -100,7 +100,7 @@ export const User = styled.div`
     }
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 820px) {
     display: none;
   }
 `;
@@ -130,7 +130,7 @@ export const NavList = styled.nav`
   flex-direction:column;
   gap:10px;
 
-  @media (max-width: 640px) {
+  @media (max-width: 820px) {
     flex-direction: row;
     align-items: center;
     gap: 8px;
@@ -167,7 +167,7 @@ export const NavItem = styled.button`
     outline: none;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 820px) {
     height: 36px;
     width: auto;
     padding: 6px 10px;
@@ -180,7 +180,7 @@ export const Icon = styled.img`
   width: 20px;
   height: 20px;
 
-  @media (max-width: 640px) {
+  @media (max-width: 820px) {
     width: 18px;
     height: 18px;
   }
@@ -191,7 +191,7 @@ export const Footer = styled.div`
   padding-top:8px;
   border-top:1px solid rgba(0,0,0,0.05);
 
-  @media (max-width: 640px) {
+  @media (max-width: 820px) {
     padding-top: 0;
     border-top: none;
     flex-shrink: 0;
@@ -210,7 +210,7 @@ export const LoginButton = styled.button`
   font-weight:700;
   cursor:pointer;
 
-  @media (max-width: 640px) {
+  @media (max-width: 820px) {
     width: auto;
     height: 36px;
     margin-bottom: 0;
@@ -231,7 +231,7 @@ export const LogoutButton = styled.button`
   background: red;
   color: white;
 
-  @media (max-width: 640px) {
+  @media (max-width: 820px) {
     width: auto;
     height: 36px;
     margin-bottom: 0;

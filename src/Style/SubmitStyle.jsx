@@ -1,17 +1,25 @@
 import styled from "styled-components";
 
 export const Main = styled.main`
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 0 16px 24px;
+  }
 `;
 
 export const HeaderSection = styled.div`
-  width: 900px;
-  height: 100px;
+  width: 100%;
+  min-height: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 30px;
-  margin-bottom: 80px;
+  margin: 30px auto 80px;
   border-radius: 40px;
   padding: 40px 20px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -37,6 +45,12 @@ export const HeaderSection = styled.div`
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     margin: 8px 0;
   }
+
+  @media (max-width: 768px) {
+    margin: 20px auto 40px;
+    border-radius: 24px;
+    padding: 28px 18px;
+  }
 `;
 
 export const FormWrapper = styled.div`
@@ -49,6 +63,11 @@ export const FormWrapper = styled.div`
 
   @media (max-width: 768px) {
     padding: 25px;
+    border-radius: 24px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 18px 14px;
   }
 `;
 
@@ -199,6 +218,10 @@ export const CheckboxLabel = styled.label`
 
   &:hover {
     color: white;
+  }
+
+  @media (max-width: 560px) {
+    align-items: flex-start;
   }
 `;
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 
 import Layout from "../Component/Common/layout.jsx";
-import SideNav from "./SideNav.jsx";
 import SearchResultsModal from "./Modals/SearchResultModal.jsx";
 
 import {
@@ -164,9 +163,7 @@ const Archive = ({ user, setUser }) => {
      RENDER
      ======================= */
   return (
-    <Layout>
-      <SideNav user={user} setUser={setUser} />
-
+    <Layout user={user} setUser={setUser}>
       <Main>
         <ArchiveHeader>
           <h1>Research Archive</h1>

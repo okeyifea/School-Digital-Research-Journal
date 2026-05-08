@@ -9,7 +9,6 @@ import {
 import { API_URL } from "../../server/API/Auth.js";
 import { buildDocumentUrl, downloadDocument } from "../utils/document.js";
 import Layout from "./Common/layout";
-import SideNav from "./SideNav";
 import SearchResultsModal from "./Modals/SearchResultModal.jsx";
 
 const Home = ({ user, setUser }) => {
@@ -55,8 +54,7 @@ const Home = ({ user, setUser }) => {
   };
 
   return (
-    <Layout>
-      <SideNav user={user} setUser={setUser} />
+    <Layout user={user} setUser={setUser}>
       <Main>
         <HomeText>
           <p style={{ fontSize: "35px", fontWeight: "800", margin: "0" }}>

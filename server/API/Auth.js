@@ -2,7 +2,6 @@
 export const API_URL = "http://localhost:5000";
 
 export const signupUser = async (payload) => {
-  console.log("Signup data being sent:", payload); // Debug log
 
   try {
     const response = await fetch(`${API_URL}/api/auth/signup`, {
@@ -28,7 +27,7 @@ export const signupUser = async (payload) => {
 };
 
 export const loginUser = async (data) => {
-  console.log("Login data:", data); // Debug log
+ 
   try {
     const response = await fetch(`${API_URL}/login`, {
       method: "POST",

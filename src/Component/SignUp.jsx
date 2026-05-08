@@ -166,7 +166,7 @@ const SignUp = () => {
     if (formData.role === "student") {payload.registrationNumber = formData.registrationNumber;}
     if (formData.role === "officer") {payload.position = formData.position;}
 
-    console.log("sent payload:", payload);
+
     const data = await signupUser(payload);
     if (data.success) {
       setModal({

@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const Dashboard = styled.div`
   margin: 0 auto;
   max-width: 1100px;
+  width: 100%;
   padding: 20px 0 32px;
   text-align: left;
 `;

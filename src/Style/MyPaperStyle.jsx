@@ -1,15 +1,25 @@
 import styled from "styled-components"; 
 
 export const Main = styled.main`
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 0 16px 24px;
+  }
 `;
 
 export const Header = styled.div`
-  width: 900px;
- display: flex;
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 30px 30px 80px 100px;
+  margin: 30px auto 80px;
   border-radius: 40px;
   padding: 40px 20px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -34,6 +44,12 @@ export const Header = styled.div`
     color: white;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     margin: 8px 0;
+  }
+
+  @media (max-width: 768px) {
+    margin: 20px auto 40px;
+    border-radius: 24px;
+    padding: 28px 18px;
   }
 `;
 

@@ -9,8 +9,9 @@ export const ArchiveHeader = styled.div`
   padding: 60px 30px;
   text-align: center;
   box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
-  margin: 30px;
+  margin: 30px auto;
   border-radius: 40px;
+  max-width: 1100px;
 
   h1 {
     font-size: 48px;
@@ -41,9 +42,10 @@ export const ArchiveHeader = styled.div`
 
 export const ArchiveContainer = styled.div`
   width: 100%;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 40px 30px;
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
     padding: 20px 15px;
@@ -98,6 +100,8 @@ export const SearchBox = styled.div`
 
   @media (max-width: 768px) {
     padding: 8px 15px;
+    width: 100%;
+    box-sizing: border-box;
 
     button {
       width: 36px;
@@ -233,8 +237,9 @@ export const CategoryItem = styled.button`
 
 // --- Papers Section ---
 export const PapersSection = styled.div`
-  width: 900px;
-  max-width: 900px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 `;
 
 export const PapersList = styled.div`
@@ -406,7 +411,13 @@ export const NoResults = styled.div`
 export const ViewMoreContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  `;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+`;
 
 export const ViewMoreButton = styled.button`
   flex: 1;

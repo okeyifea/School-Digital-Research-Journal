@@ -5,8 +5,9 @@ export const LoginCard = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  max-height: 100vh;
+  min-height: 100vh;
   padding: 20px;
+  box-sizing: border-box;
 
   > div:first-child {
     width: 100%;

@@ -31,6 +31,7 @@ const Root = styled.div`
   display: flex;
   min-height: 100vh;
   width: 100%;
+  background: #f8fafc;
 `;
 
 const Main = styled.main`
@@ -38,15 +39,18 @@ const Main = styled.main`
   margin-left: 270px;
   min-height: 100vh;
   width: calc(100% - 270px);
-  left: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 
-  @media (max-width: 900px) {
+  @media (max-width: 960px) {
     margin-left: 220px;
-    padding: 90px 20px 30px;
+    width: calc(100% - 220px);
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 820px) {
     margin-left: 0;
-    padding: 96px 16px 24px;
+    width: 100%;
+    padding-top: 92px;
   }
 `;

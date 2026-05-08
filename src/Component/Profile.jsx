@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import {
   Main,
@@ -37,12 +36,10 @@ import {
 import ProfileIcon from "./Common/Icons/profile-user.svg"
 
 import Layout from "./Common/layout";
-import SideNav from "./SideNav";
 import { API_URL } from "../../server/API/Auth.js";
 import { useToast } from "./Common/Toast.jsx";
 
 const Profile = ({ user, setUser }) => {
-  const navigate = useNavigate();
   const { addToast } = useToast();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -70,12 +67,6 @@ const Profile = ({ user, setUser }) => {
     setSuccessMessage(msg);
     addToast(msg);
     setTimeout(() => setSuccessMessage(""), 3000);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-    navigate("/login");
   };
 
   /* -------------------- PROFILE -------------------- */
@@ -143,7 +134,7 @@ const Profile = ({ user, setUser }) => {
         },
         body: JSON.stringify({ currentPassword, newPassword })
       });
-      console.log("Token from localStorage:", token);
+     
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
@@ -180,9 +171,7 @@ const Profile = ({ user, setUser }) => {
   /* -------------------- UI -------------------- */
 
   return (
-    <Layout>
-      <SideNav user={user} onLogout={handleLogout} />
-
+    <Layout user={user} setUser={setUser}>
       <Main>
         <ProfileContainer>
           <ProfileContent>

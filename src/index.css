@@ -21,11 +21,19 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
   color: black;
+  background: #f8fafc;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
 }
 
 h1 {
@@ -43,7 +51,7 @@ button {
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
-  margin-top: 20px;
+  margin-top: 0;
 }
 button:hover {
   border-color: #646cff;

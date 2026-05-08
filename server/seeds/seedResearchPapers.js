@@ -133,7 +133,7 @@ const main = async () => {
     }
 
     await db.ResearchPaper.insertMany(papers);
-    console.log("Research papers seeded successfully.");
+    
   } catch (error) {
     console.error("Error seeding research papers:", error);
     process.exitCode = 1;

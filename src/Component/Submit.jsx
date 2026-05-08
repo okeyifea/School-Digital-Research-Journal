@@ -2,7 +2,6 @@ import React , { useState, useEffect } from "react";
 //import styled from "styled-components";
 //import Header from "./Header";
 import Layout from "./Common/layout";
-import SideNav from "./SideNav";
 import Modal from "./Common/Modal.jsx";
 
 import {
@@ -139,8 +138,7 @@ const Submit = ({ user, setUser }) => {
   }, []);
 
   return (
-    <Layout>
-      <SideNav user={user} onLogout={() => setUser?.(null)} />
+    <Layout user={user} setUser={setUser}>
         <Main>
           <HeaderSection>
             <h1 style={{ fontSize: "35px", fontWeight: "800", margin: "0", color: "white" }}>
