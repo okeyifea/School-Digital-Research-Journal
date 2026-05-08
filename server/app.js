@@ -19,13 +19,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsPath = path.resolve(__dirname, "..", "uploads");
 app.use("/uploads", express.static(uploadsPath));
 
-app.use("/api/research", researchRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/auth", restRoutes);
-app.use("/api", dashboardRoutes);
-app.use("/api", reviewRoutes);
+const BASE_API_PATH = process.env.VERCEL ? "" : "/api";
 
-app.post("/api/auth/login", async (req, res) => {
+app.use(`${BASE_API_PATH}/research`, researchRoutes);
+app.use(`${BASE_API_PATH}/auth`, authRoutes);
+app.use(`${BASE_API_PATH}/auth`, restRoutes);
+app.use(`${BASE_API_PATH}`, dashboardRoutes);
+app.use(`${BASE_API_PATH}`, reviewRoutes);
+
+app.post(`${BASE_API_PATH}/auth/login`, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({ success: false, message: "Username and password required" });
@@ -145,7 +147,7 @@ const handleSignup = async (req, res) => {
   }
 };
 
-app.post("/api/auth/signup", handleSignup);
+app.post(`${BASE_API_PATH}/auth/signup`, handleSignup);
 
 app.get("/", (req, res) => {
   res.send("Backend server running 🚀");
