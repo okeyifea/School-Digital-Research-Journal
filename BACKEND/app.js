@@ -12,11 +12,20 @@ import dashboardRoutes from "./API/Dashboard.js";
 import reviewRoutes from "./API/Review.js";
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://gounijournal.vercel.app",
+      "http://localhost:5174",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const uploadsPath = path.resolve(__dirname, "uploads");
+const uploadsPath = path.resolve(__dirname, "..", "uploads");
 app.use("/uploads", express.static(uploadsPath));
 
 app.use("/api/research", researchRoutes);
